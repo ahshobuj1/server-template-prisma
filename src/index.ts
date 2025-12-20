@@ -1,10 +1,7 @@
-import 'dotenv/config';
-import {Prisma, PrismaClient} from '../prisma/generated/client';
-import {PrismaPg} from '@prisma/adapter-pg';
 import express from 'express';
-
-const pool = new PrismaPg({connectionString: process.env.DATABASE_URL!});
-const prisma = new PrismaClient({adapter: pool});
+import 'dotenv/config';
+import {Prisma} from '../prisma/generated/client';
+import {prisma} from './lib';
 
 const app = express();
 
@@ -29,17 +26,17 @@ app.post(`/signup`, async (req, res) => {
   res.json(result);
 });
 
-app.post(`/post`, async (req, res) => {
-  const {title, content, authorEmail} = req.body;
-  const result = await prisma.post.create({
-    data: {
-      title,
-      content,
-      author: {connect: {email: authorEmail}},
-    },
-  });
-  res.json(result);
-});
+// app.post(`/post`, async (req, res) => {
+//   const {title, content, authorEmail} = req.body;
+//   const result = await prisma.post.create({
+//     data: {
+//       title,
+//       content,
+//       author: {connect: {email: authorEmail}},
+//     },
+//   });
+//   res.json(result);
+// });
 
 app.put('/post/:id/views', async (req, res) => {
   const {id} = req.params;
@@ -92,7 +89,15 @@ app.delete(`/post/:id`, async (req, res) => {
 });
 
 app.get('/users', async (req, res) => {
-  const users = await prisma.user.findMany();
+  const users = await prisma.user.findUniqueOrThrow({
+    where: {id: 2},
+    select: {
+      email: true,
+      name: false,
+      id: true,
+    },
+  });
+  console.log(users);
   res.json(users);
 });
 
@@ -101,7 +106,7 @@ app.get('/user/:id/drafts', async (req, res) => {
 
   const drafts = await prisma.post.findMany({
     where: {
-      authorId: Number(id),
+      userId: Number(id),
       published: false,
     },
   });
@@ -135,7 +140,7 @@ app.get('/feed', async (req, res) => {
       published: true,
       ...or,
     },
-    include: {author: true},
+    include: {user: true},
     take: Number(take) || undefined,
     skip: Number(skip) || undefined,
     orderBy: {
@@ -144,6 +149,231 @@ app.get('/feed', async (req, res) => {
   });
 
   res.json(posts);
+});
+
+app.get('/users', async (req, res) => {
+  const users = await prisma.user.findUniqueOrThrow({
+    where: {id: 2},
+    select: {
+      email: true,
+      name: false,
+      id: true,
+    },
+  });
+  console.log(users);
+  res.json(users);
+});
+
+app.get(`/posts`, async (req, res) => {
+  // const {title, content, authorEmail} = req.body;
+
+  const result = await prisma.testModel.createManyAndReturn({
+    data: [
+      {
+        name: 'Firsfggt Pdscxcost',
+        value: 423,
+      },
+      {
+        name: 'Firsfgfgt Podsfsdst',
+        value: 422,
+      },
+      {
+        name: 'Firfgbfst Post32er',
+        value: 43,
+      },
+      {
+        name: 'Firsfggfgt Pdscxcost',
+        value: 423,
+      },
+      {
+        name: 'Firstfgg Podsfsdst',
+        value: 422,
+      },
+      {
+        name: 'Firfgfggffst Post32er',
+        value: 43,
+      },
+      {
+        name: 'Firfgfst Pdscxcost',
+        value: 423,
+      },
+      {
+        name: 'Firstgf ggfPodsfsdst',
+        value: 422,
+      },
+      {
+        name: 'First Pogfgffdgst32er',
+        value: 43,
+      },
+      {
+        name: 'First Pdsgffgchfghfgbhxcost',
+        value: 423,
+      },
+      {
+        name: 'First Podsfgfhfghsdst',
+        value: 422,
+      },
+      {
+        name: 'First Posfghfft32er',
+        value: 43,
+      },
+    ],
+  });
+
+  console.log(result);
+
+  res.json(result);
+});
+
+app.get('/testModel', async (req, res) => {
+  // Get, Filter, Sort , Pagination
+  const users = await prisma.testModel.findMany({
+    where: {
+      OR: [
+        {
+          name: {
+            startsWith: 'First Poswsdwedwedwet',
+          },
+        },
+        {
+          AND: {
+            id: {
+              lt: 30,
+            },
+          },
+        },
+      ],
+    },
+    orderBy: {
+      id: 'desc',
+    },
+    select: {
+      id: true,
+      name: true,
+    },
+
+    skip: 10, // Offset pagination
+    take: 10, // Offset pagination
+    cursor: {
+      // for pagination cursor
+      id: 15,
+    },
+  });
+
+  // const users = await prisma.testModel.findFirst({
+  //   where: {
+  //     id: {
+  //       gt: 15,
+  //     },
+  //   },
+  // });
+
+  const result = {
+    total: users.length,
+    users,
+  };
+
+  console.log(result);
+
+  res.json(result);
+});
+
+app.get('/testModels', async (req, res) => {
+  const users = await prisma.testModel.findMany({
+    orderBy: {
+      id: 'asc',
+    },
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+
+  const result = {
+    total: users.length,
+    users,
+  };
+
+  console.log(result);
+
+  res.json(result);
+});
+
+app.get('/testModelUpdate', async (req, res) => {
+  const result = await prisma.testModel.upsert({
+    where: {
+      id: 1222,
+    },
+    update: {
+      name: 'Updated Name  for First Postasadasdasdasdasdasdswadasdasdasdas ',
+    },
+    create: {
+      name: 'First Postttttttttttttttttttttttt',
+      value: 100,
+    },
+  });
+
+  console.log(result);
+
+  res.json(result);
+});
+
+app.get('/testModelDelete', async (req, res) => {
+  const result = await prisma.testModel.deleteMany({
+    where: {
+      name: {
+        contains: 'First Pods',
+      },
+    },
+  });
+
+  console.log(result);
+
+  res.json(result);
+});
+
+app.get('/test', async (req, res) => {
+  const result = await prisma.user.findUnique({
+    where: {id: 1},
+    include: {
+      _count: {
+        select: {posts: true},
+      },
+    },
+  });
+
+  // const result = {
+  //   // total: users.length,
+  //   users,
+  // };
+
+  console.log(result);
+
+  res.json(result);
+});
+
+app.get('/test1', async (req, res) => {
+  const result = await prisma.post.findMany({
+    select: {
+      id: true,
+      title: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+        },
+      },
+    },
+  });
+
+  // const result = {
+  //   // total: users.length,
+  //   users,
+  // };
+
+  console.log(result);
+
+  res.json(result);
 });
 
 const server = app.listen(3000, () =>
