@@ -8,34 +8,30 @@ datasource db {
 }
 
 enum UserRole {
+  SUPER_ADMIN
   ADMIN
-  USER
+  DOCTOR
+  PATIENT
 }
 
 model User {
-  id    Int      @id @default(autoincrement())
-  email String   @unique
-  name  String?
-  role  UserRole @default(USER)
-  post  Post[]
+  id                  String   @id @default(uuid())
+  password            String
+  email               String   @unique
+  role                UserRole @default(PATIENT)
+  needsPasswordChange Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  admin               Admin?
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  viewCount Int      @default(0)
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-}
-
-model TestModel {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  name      String
-  value     Int
+model Admin {
+  id          String   @id @default(uuid())
+  name        String
+  contact     String?
+  profile_url String?
+  email       String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [email], references: [email])
 }

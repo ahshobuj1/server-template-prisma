@@ -52,8 +52,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
-  Post: 'Post',
-  TestModel: 'TestModel'
+  Admin: 'Admin'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -74,37 +73,28 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const UserScalarFieldEnum = {
   id: 'id',
+  password: 'password',
   email: 'email',
-  name: 'name',
-  role: 'role'
+  role: 'role',
+  needsPasswordChange: 'needsPasswordChange',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
-export const PostScalarFieldEnum = {
+export const AdminScalarFieldEnum = {
   id: 'id',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  title: 'title',
-  content: 'content',
-  published: 'published',
-  viewCount: 'viewCount',
-  userId: 'userId'
-} as const
-
-export type PostScalarFieldEnum = (typeof PostScalarFieldEnum)[keyof typeof PostScalarFieldEnum]
-
-
-export const TestModelScalarFieldEnum = {
-  id: 'id',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
   name: 'name',
-  value: 'value'
+  contact: 'contact',
+  profile_url: 'profile_url',
+  email: 'email',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
-export type TestModelScalarFieldEnum = (typeof TestModelScalarFieldEnum)[keyof typeof TestModelScalarFieldEnum]
+export type AdminScalarFieldEnum = (typeof AdminScalarFieldEnum)[keyof typeof AdminScalarFieldEnum]
 
 
 export const SortOrder = {
